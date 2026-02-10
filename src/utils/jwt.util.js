@@ -6,21 +6,36 @@ dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
+if (!JWT_SECRET) {
+    console.error('❌ JWT_SECRET no está definido');
+    throw new Error('JWT_SECRET no está definido en las variables de entorno');
+}
+
 /**
+ * Genera un token JWT
  * @param {Object} payload
  * @returns {string}
 */
 export const generateToken = (payload) => {
     try {
-        return jwt.sign(payload, JWT_SECRET, {
+        const cleanPayload = {
+            id: payload.id?.toString() || payload._id?.toString(),
+            email: payload.email,
+            role: payload.role,
+            cart: payload.cart?.toString() || null
+        };
+        
+        return jwt.sign(cleanPayload, JWT_SECRET, {
             expiresIn: JWT_EXPIRES_IN
         });
     } catch (error) {
+        console.error('❌ Error al generar token:', error);
         throw new Error('Error al generar el token JWT');
     }
 };
 
 /** 
+ * Verifica y decodifica un token JWT 
  * @param {string} token
  * @returns {Object}
 */
@@ -38,7 +53,8 @@ export const verifyToken = (token) => {
     }
 };
 
-/**
+/** 
+ * Extrae el token de las cookies o headers
  * @param {Object}
  * @returns {string|null}
 */

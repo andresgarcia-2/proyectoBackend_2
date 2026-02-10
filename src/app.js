@@ -1,6 +1,8 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
 import { connectDB } from './config/database.js';
 import passport from './config/passport.config.js';
 
@@ -9,10 +11,12 @@ import usersRouter from './routes/users.router.js';
 import cartsRouter from './routes/carts.router.js';
 import productsRouter from './routes/products.router.js';
 
-dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+console.log('🔍 Verificando variables de entorno...');
+console.log('MONGO_URI:', process.env.MONGO_URI ? '✅ Definida' : '❌ No definida');
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? '✅ Definida' : '❌ No definida');
 
 connectDB();
 

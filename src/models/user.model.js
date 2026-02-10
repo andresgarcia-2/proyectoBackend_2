@@ -14,7 +14,6 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: [true, 'El email es requerido'],
-        unique: true,
         lowercase: true,
         trim: true,
         match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Email inválido']
@@ -49,7 +48,7 @@ const userSchema = new mongoose.Schema({
     versionKey: false
 });
 
-userSchema.index({ email: 1 });
+userSchema.index({ email: 1 }, { unique: true });
 
 userSchema.methods.toJSON = function() {
     const user = this.toObject();
