@@ -145,4 +145,35 @@ router.get('/validate', authenticateCurrent, (req, res) => {
     });
 });
 
+router.post('/refresh', authenticateCurrent, async (req, res) => {
+    try {
+        const token = req.cookies.token;
+
+        const expiringSoon = isTokenExpiringSoon(token);
+        const timeLeft = getTokenTimeLeft(token);
+
+        const tokenPayload = new UserTokenDTO(req.user);
+        const newToken = generateToken(tokenPayload);
+
+        res.cookie('token', newToken, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        });res.json({
+            status: 'success',
+            message: 'Token renovado exitosamente',
+            wasExpiringSoon: expiringSoon,
+            previousTimeLeft: `${timeLeft} segundos`,
+            token: newToken
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            status: 'error',
+            error: 'Error al renovar token',
+            details: error.message 
+        });
+    }
+});
+
 export default router;
