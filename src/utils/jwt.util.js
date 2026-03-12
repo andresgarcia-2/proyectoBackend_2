@@ -5,17 +5,12 @@ dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
+const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
 if (!JWT_SECRET) {
-    console.error('❌ JWT_SECRET no está definido');
     throw new Error('JWT_SECRET no está definido en las variables de entorno');
 }
 
-/**
- * Genera un token JWT
- * @param {Object} payload
- * @returns {string}
-*/
 export const generateToken = (payload) => {
     try {
         const cleanPayload = {
@@ -34,11 +29,21 @@ export const generateToken = (payload) => {
     }
 };
 
-/** 
- * Verifica y decodifica un token JWT 
- * @param {string} token
- * @returns {Object}
-*/
+export const generateRefreshToken = (payload) => {
+    try {
+        const cleanPayload = {
+            id: payload.id?.toString() || payload._id?.toString(),
+            email: payload.email
+        };
+
+        return jwt.sign(cleanPayload, JWT_SECRET, {
+            expiresIn: JWT_REFRESH_EXPIRES_IN
+        });
+    } catch (error) {
+        throw new Error('Error al generar el refresh token');
+    }
+};
+
 export const verifyToken = (token) => {
     try {
         return jwt.verify(token, JWT_SECRET);
@@ -53,11 +58,31 @@ export const verifyToken = (token) => {
     }
 };
 
-/** 
- * Extrae el token de las cookies o headers
- * @param {Object}
- * @returns {string|null}
-*/
+export const isTokenExpiringSoon = (token) => {
+    try {
+        const decoded = jwt.decode(token);
+        if (!decoded || !decoded.exp) return false;
+        
+        const now = Math.floor(Date.now() / 1000);
+        const timeLeft = decoded.exp - now;
+        
+        return timeLeft < 3600;
+    } catch {
+        return false;
+    }
+};
+
+export const getTokenTimeLeft = (token) => {
+    try {
+        const decoded = jwt.decode(token);
+        if (!decoded || !decoded.exp) return 0;
+        
+        const now = Math.floor(Date.now() / 1000);
+        return Math.max(0, decoded.exp - now);
+    } catch {
+        return 0;
+    }
+};
 
 export const extractToken = (req) => {
     if (req.cookies && req.cookies.token) {
