@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { generateToken } from '../utils/jwt.util.js';
+import { generateToken, isTokenExpiringSoon, getTokenTimeLeft  } from '../utils/jwt.util.js';
 import { UserDTO, UserTokenDTO } from '../dto/user.dto.js';
 import { authenticateCurrent } from '../middlewares/auth.middleware.js';
 
