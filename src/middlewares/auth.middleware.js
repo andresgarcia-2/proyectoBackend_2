@@ -97,3 +97,25 @@ export const isOwnerOrAdmin = (req, res, next) => {
         message: 'No tienes permiso para acceder a este recurso'
     });
 };
+
+export const authMiddleware = (roles = []) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'No autenticado. Debes iniciar sesión.'
+            });
+        }
+
+        if (roles.length === 0) return next();
+        
+        if (!roles.includes(req.user.role)) {
+            return res.status(403).json({
+                status: 'error',
+                message: `Acceso denegado. Se requiere rol: ${roles.join(' o ')}`
+            });
+        }
+
+        next();
+    };
+};
