@@ -10,6 +10,7 @@ import sessionsRouter from './routes/sessions.router.js';
 import usersRouter from './routes/users.router.js';
 import cartsRouter from './routes/carts.router.js';
 import productsRouter from './routes/products.router.js';
+import mocksRouter from './routes/mocks.router.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -35,6 +36,7 @@ app.use('/api/sessions', sessionsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/api/products', productsRouter);
+app.use('/api/mocks', mocksRouter);
 
 app.get('/', (req, res) => {
     res.json({
@@ -44,7 +46,8 @@ app.get('/', (req, res) => {
             sessions: '/api/sessions',
             users: '/api/users',
             carts: '/api/carts',
-            products: '/api/products'
+            products: '/api/products',
+            mocks: '/api/mocks'
         }
     });
 });
