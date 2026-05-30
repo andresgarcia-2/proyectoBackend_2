@@ -1,4 +1,6 @@
 import dotenv from 'dotenv';
+import adoptionRouter from './routes/adoption.router.js';
+app.use('/adoption', adoptionRouter);
 dotenv.config();
 
 import express from 'express';
